@@ -2,6 +2,7 @@
 
 const inquirer = require('inquirer');
 const { Octokit } = require('@octokit/core');
+const chalk = require('chalk');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -46,7 +47,18 @@ const getGitHubAccounts = () => {
     }
 };
 
-const askQuestions = async (accountsName, accObjArray) => {
+const getSSHHosts = (accObjArray) => {
+    if (accObjArray.length > 1) {
+        const configPath = path.join(os.homedir(), '.ssh/config');
+        const configFile = fs.readFileSync(configPath, 'utf8');
+        const re = /Host (.*)/gim;
+        return configFile.match(re).map((host) => host.replace('Host ', ''));
+    }
+
+    return null;
+};
+
+const repoQuestions = async (accountsName, accObjArray) => {
     return inquirer.prompt([
         {
             type: 'list',
@@ -64,93 +76,121 @@ const askQuestions = async (accountsName, accObjArray) => {
         {
             type: 'list',
             name: 'private',
-            message: 'Is the repository Private?',
+            message: 'Is this a Private repository?',
             choices: ['true', 'false'],
             default: 'true',
         },
     ]);
 };
 
-const createCDFolder = (newFolderPath) => {
+const sshQuestion = (accObjArray) => {
+    const hosts = getSSHHosts(accObjArray);
+    return inquirer.prompt([
+        {
+            type: 'list',
+            name: 'ssh',
+            message: 'What SSH key do you want to use?',
+            choices: hosts,
+            when: () => accObjArray.length > 1 && hosts,
+        },
+    ]);
+};
+
+const createCDFolder = (newFolderPath, newFolderName) => {
     if (!fs.existsSync(newFolderPath)) {
         fs.mkdirSync(newFolderPath);
         process.chdir(newFolderPath);
     } else {
-        console.log('Folder already exists, process aborted!');
+        console.log(
+            chalk.red('Process aborted! ') +
+                chalk.yellow(`A folder named ${newFolderName} already exists.`)
+        );
         process.exit(0);
     }
 };
 
 const copyGitignore = (gitignoreGlobal) => {
-    console.log('——————› Copying .gitignore_global...');
+    console.log(chalk.blue('——————› Copying .gitignore_global...'));
     if (fs.existsSync(gitignoreGlobal)) {
         fs.copyFileSync(gitignoreGlobal, `.gitignore`);
-        console.log('   Done!');
     } else {
         console.log(
-            `Looks like you don't have ${gitignoreGlobal}. The process will continue without creating one.`
+            chalk.yellow(
+                `Looks like you don't have ${gitignoreGlobal}. The process will continue without creating one.`
+            )
         );
     }
 };
 
-const createREADME = (answers) => {
-    console.log('——————› Creating README.md...');
-    const text = `<h1 id='contents'>Table of Contents</h1>\n\n- [${answers.repositoryName.toUpperCase()}](#${answers.repositoryName
+const createREADME = (repoAnswers) => {
+    console.log(chalk.blue('——————› Creating README.md...'));
+    const text = `<h1 id='contents'>Table of Contents</h1>\n\n- [${repoAnswers.repositoryName.toUpperCase()}](#${repoAnswers.repositoryName
         .trim()
         .replace(
             /\s+/g,
             '-'
-        )})\n\n# ${answers.repositoryName.toUpperCase()}\n\n[Go Back to Contents](#contents)\n\n`;
+        )})\n\n# ${repoAnswers.repositoryName.toUpperCase()}\n\n[Go Back to Contents](#contents)\n\n`;
     fs.writeFileSync('README.md', text);
 };
 
-const createRemoteRepo = async (answers, newFolderName, accObjArray) => {
-    console.log('——————› Creating GitHub repository...');
-    const profile = accObjArray.find((prof) => prof.acc === answers.acc);
+const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
+    console.log(chalk.blue('——————› Creating GitHub repository...'));
+    const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
     const octokit = new Octokit({ auth: profile.token });
 
     try {
         return await octokit.request('POST /user/repos', {
             name: newFolderName,
-            private: answers.private,
+            private: repoAnswers.private,
         });
     } catch (error) {
         throw new Error(error);
     }
 };
 
-const pushFirstCommit = (answers, newFolderName) => {
-    console.log('——————› Pushing first commit...');
+const pushFirstCommit = async (repoAnswers, newFolderName, accObjArray) => {
+    const sshAnswers = await sshQuestion(accObjArray);
+
+    console.log(chalk.blue('——————› Pushing first commit...'));
     execSync('git init; git add .; git commit -m "First Commit"');
     execSync('git branch -M main');
-    execSync(
-        `git remote add origin https://github.com/${answers.acc}/${newFolderName}.git`
-    );
+
+    if (sshAnswers) {
+        execSync(
+            `git remote add origin git@${sshAnswers.ssh}:/${repoAnswers.acc}/${newFolderName}.git`
+        );
+    } else {
+        execSync(
+            `git remote add origin https://github.com/${repoAnswers.acc}/${newFolderName}.git`
+        );
+    }
     execSync('git push -u origin main');
 };
 
 const createRepo = async () => {
     const accObjArray = getGitHubAccounts();
     const accountsName = accObjArray.map((profile) => profile.acc);
-    const answers = await askQuestions(accountsName, accObjArray);
+    const repoAnswers = await repoQuestions(accountsName, accObjArray);
 
-    if (!answers.hasOwnProperty('acc')) {
-        answers.acc = accObjArray[0].acc;
+    if (!repoAnswers.hasOwnProperty('acc')) {
+        repoAnswers.acc = accObjArray[0].acc;
     }
 
-    const newFolderName = answers.repositoryName.trim().replace(/\s+/g, '_');
+    const newFolderName = repoAnswers.repositoryName
+        .trim()
+        .replace(/\s+/g, '_');
     const newFolderPath = path.join(process.cwd(), newFolderName);
 
-    createCDFolder(newFolderPath);
+    createCDFolder(newFolderPath, newFolderName);
     copyGitignore(gitignoreGlobal, newFolderPath);
-    createREADME(answers);
+    createREADME(repoAnswers);
 
     try {
-        await createRemoteRepo(answers, newFolderName, accObjArray);
-        pushFirstCommit(answers, newFolderName);
-        console.log('All Done!');
+        await createRemoteRepo(repoAnswers, newFolderName, accObjArray);
+        await pushFirstCommit(repoAnswers, newFolderName, accObjArray);
+        console.log(chalk.green('All Done!'));
     } catch (error) {
-        console.log(error);
+        console.log(chalk.red(error));
     }
 
     process.exit(0);
