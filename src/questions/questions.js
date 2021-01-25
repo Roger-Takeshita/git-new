@@ -7,8 +7,7 @@ const { listOrganizations } = require('../github/github');
 const orgQuestion = async (repoAnswers, accObjArray) => {
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
     const orgArray = await listOrganizations(profile);
-
-    return inquirer.prompt([
+    const answers = await inquirer.prompt([
         {
             type: 'list',
             name: 'org',
@@ -17,10 +16,12 @@ const orgQuestion = async (repoAnswers, accObjArray) => {
             when: () => orgArray.length > 1,
         },
     ]);
+
+    return answers;
 };
 
-const repoQuestions = (accNameArray, accObjArray) => {
-    return inquirer.prompt([
+const repoQuestions = async (accNameArray, accObjArray) => {
+    const answers = await inquirer.prompt([
         {
             type: 'list',
             name: 'acc',
@@ -42,12 +43,13 @@ const repoQuestions = (accNameArray, accObjArray) => {
             default: 'true',
         },
     ]);
+
+    return answers;
 };
 
-const sshQuestion = (accObjArray, repoAnswers) => {
+const sshQuestion = async (accObjArray, repoAnswers) => {
     const hosts = getSSHHosts(accObjArray);
-
-    return inquirer.prompt([
+    const answers = await inquirer.prompt([
         {
             type: 'list',
             name: 'ssh',
@@ -56,6 +58,8 @@ const sshQuestion = (accObjArray, repoAnswers) => {
             when: () => accObjArray.length > 1 && hosts && accObjArray[0].acc !== repoAnswers.acc,
         },
     ]);
+
+    return answers;
 };
 
 module.exports = {

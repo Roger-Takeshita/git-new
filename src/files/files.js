@@ -7,21 +7,20 @@ const createCDFolder = (newFolderPath, newFolderName) => {
         process.chdir(newFolderPath);
     } else {
         console.log(
-            chalk.red('Process aborted! ') +
-                chalk.yellow(`A folder named ${newFolderName} already exists.`),
+            chalk.red('ERROR: ') + chalk.yellow(`A folder named ${newFolderName} already exists.`),
         );
-        process.exit(0);
+        process.exit();
     }
 };
 
 const copyGitignore = (gitignoreGlobal) => {
     console.log(chalk.blue('——————› Copying .gitignore_global...'));
     if (fs.existsSync(gitignoreGlobal)) {
-        fs.copyFileSync(gitignoreGlobal, `.gitignore`);
+        fs.copyFileSync(gitignoreGlobal, '.gitignore');
     } else {
         console.log(
             chalk.yellow(
-                `Looks like you don't have ${gitignoreGlobal}. The process will continue without creating one.`,
+                `WARNING: Looks like you don't have ${gitignoreGlobal}. The process will continue without creating a .gitignore file.`,
             ),
         );
     }

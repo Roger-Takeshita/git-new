@@ -1,25 +1,30 @@
 {
-    "name": "npm_new",
+    "name": "git-new",
     "version": "1.0.0",
-    "description": "Creates a new GitHub repository",
+    "description": "Create a new GitHub repository",
     "main": "src/index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "lint": "eslint src/"
     },
     "bin": "./src/index.js",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Roger-Takeshita/npm_new.git"
+        "url": "git+https://github.com/Roger-Takeshita/git-new.git"
     },
     "author": "Roger Takeshita",
-    "license": "ISC",
+    "license": "MIT",
     "bugs": {
-        "url": "https://github.com/Roger-Takeshita/npm_new/issues"
+        "url": "https://github.com/Roger-Takeshita/git-new/issues"
     },
-    "homepage": "https://github.com/Roger-Takeshita/npm_new#readme",
+    "homepage": "https://github.com/Roger-Takeshita/git-new#readme",
     "dependencies": {
         "@octokit/core": "^3.2.4",
         "chalk": "^4.1.0",
         "inquirer": "^7.3.3"
+    },
+    "devDependencies": {
+        "eslint": "^7.18.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-plugin-import": "^2.22.1"
     }
 }

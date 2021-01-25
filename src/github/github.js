@@ -1,13 +1,24 @@
 const { Octokit } = require('@octokit/core');
 const chalk = require('chalk');
-const execSync = require('child_process').execSync;
+const { execSync } = require('child_process');
 
 const listOrganizations = async (profile) => {
     try {
+        if (profile.token === '') {
+            console.log(
+                chalk.red('.gitconfig ERROR:') +
+                    chalk.yellow(' user.token not found. Please add a token using the command ') +
+                    chalk.blue('git config --global user.token "your_github_personal_token"') +
+                    chalk.yellow(' and try again.'),
+            );
+            process.exit();
+        }
+
         const octokit = new Octokit({ auth: profile.token });
         const organizations = await octokit.request('GET /user/orgs');
         const orgNamesArray = organizations.data.map((org) => org.login);
         orgNamesArray.unshift('Personal');
+
         return orgNamesArray;
     } catch (error) {
         throw new Error(error);
@@ -17,21 +28,33 @@ const listOrganizations = async (profile) => {
 const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
     console.log(chalk.blue('——————› Creating GitHub repository...'));
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
-    const octokit = new Octokit({ auth: profile.token });
 
+    if (profile.token === '') {
+        console.log(
+            chalk.red('.gitconfig ERROR:') +
+                chalk.yellow(' user.token not found. Please add a token using the command ') +
+                chalk.blue('git config --global user.token "your_github_personal_token"') +
+                chalk.yellow(' and try again.'),
+        );
+        process.exit();
+    }
+
+    const octokit = new Octokit({ auth: profile.token });
     try {
         if (repoAnswers.org === 'Personal') {
             return await octokit.request('POST /user/repos', {
                 name: newFolderName,
-                private: repoAnswers.private === 'true' ? true : false,
-            });
-        } else {
-            await octokit.request('POST /orgs/{org}/repos', {
-                org: repoAnswers.org,
-                name: newFolderName,
+                // eslint-disable-next-line no-unneeded-ternary
                 private: repoAnswers.private === 'true' ? true : false,
             });
         }
+
+        return await octokit.request('POST /orgs/{org}/repos', {
+            org: repoAnswers.org,
+            name: newFolderName,
+            // eslint-disable-next-line no-unneeded-ternary
+            private: repoAnswers.private === 'true' ? true : false,
+        });
     } catch (error) {
         throw new Error(error);
     }
@@ -39,10 +62,10 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
 
 const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
     console.log(chalk.blue('——————› Pushing first commit...'));
-    execSync('git init; git add .; git commit -m "First Commit"');
+    execSync('git init && git add . && git commit -m "First Commit"');
     execSync('git branch -M main');
 
-    if (sshAnswers.hasOwnProperty('ssh')) {
+    if (Object.prototype.hasOwnProperty.call(sshAnswers, 'ssh')) {
         if (repoAnswers.org === 'Personal') {
             execSync(
                 `git remote add origin git@${sshAnswers.ssh}:/${repoAnswers.acc}/${newFolderName}.git`,
@@ -52,16 +75,14 @@ const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
                 `git remote add origin git@${sshAnswers.ssh}:/${repoAnswers.org}/${newFolderName}.git`,
             );
         }
+    } else if (repoAnswers.org === 'Personal') {
+        execSync(
+            `git remote add origin https://github.com/${repoAnswers.acc}/${newFolderName}.git`,
+        );
     } else {
-        if (repoAnswers.org === 'Personal') {
-            execSync(
-                `git remote add origin https://github.com/${repoAnswers.acc}/${newFolderName}.git`,
-            );
-        } else {
-            execSync(
-                `git remote add origin https://github.com/${repoAnswers.org}/${newFolderName}.git`,
-            );
-        }
+        execSync(
+            `git remote add origin https://github.com/${repoAnswers.org}/${newFolderName}.git`,
+        );
     }
 
     execSync('git push -u origin main');

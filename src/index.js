@@ -16,13 +16,13 @@ const createRepo = async () => {
     const repoAnswers = await repoQuestions(accNameArray, accObjArray);
     let url = '';
 
-    if (!repoAnswers.hasOwnProperty('acc')) {
+    if (!Object.prototype.hasOwnProperty.call(repoAnswers, 'acc')) {
         repoAnswers.acc = accObjArray[0].acc;
     }
 
     const orgAnswer = await orgQuestion(repoAnswers, accObjArray);
 
-    if (!orgAnswer.hasOwnProperty('org')) {
+    if (!Object.prototype.hasOwnProperty.call(orgAnswer, 'org')) {
         repoAnswers.org = 'Personal';
     } else {
         repoAnswers.org = orgAnswer.org;
@@ -49,7 +49,7 @@ const createRepo = async () => {
     console.log(chalk.gray('Organization: ') + chalk.green(`${repoAnswers.org}`));
     console.log(chalk.gray("Repo's Name:  ") + chalk.green(`${newFolderName}`));
     console.log(chalk.gray('Private:      ') + chalk.green(`${repoAnswers.private}`));
-    console.log(chalk.gray('url:          ') + chalk.green(`${url}`));
+    console.log(chalk.gray('url:          ') + chalk.blue(`${url}`));
     console.log(chalk.green.inverse('All Done!'));
 
     process.exit(0);

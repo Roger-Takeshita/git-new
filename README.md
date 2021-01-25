@@ -1,7 +1,23 @@
-<h1 id='contents'>Table of Contents</h1>
+# git-new
 
-- [NPM NEW](#npm-new)
+Easy way to create personal/organization repositories on GitHub (only).
 
-# NPM NEW
+## What's the purpose?
 
-[Go Back to Contents](#contents)
+Creates a new github repository only using the terminal.
+
+## Installation
+
+```Bash
+  npm install -g git-new
+```
+
+## How to use?
+
+On your `terminal`:
+
+```Bash
+  git-new
+```
+
+**Under construction...**
