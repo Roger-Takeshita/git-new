@@ -2,6 +2,22 @@ const inquirer = require('inquirer');
 const path = require('path');
 
 const { getSSHHosts } = require('../info/info');
+const { listOrganizations } = require('../github/github');
+
+const orgQuestion = async (repoAnswers, accObjArray) => {
+    const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
+    const orgArray = await listOrganizations(profile);
+
+    return inquirer.prompt([
+        {
+            type: 'list',
+            name: 'org',
+            message: 'In what organization do you want to create?',
+            choices: orgArray,
+            when: () => orgArray.length > 1,
+        },
+    ]);
+};
 
 const repoQuestions = (accNameArray, accObjArray) => {
     return inquirer.prompt([
@@ -28,7 +44,7 @@ const repoQuestions = (accNameArray, accObjArray) => {
     ]);
 };
 
-const sshQuestion = (accObjArray) => {
+const sshQuestion = (accObjArray, repoAnswers) => {
     const hosts = getSSHHosts(accObjArray);
 
     return inquirer.prompt([
@@ -37,12 +53,13 @@ const sshQuestion = (accObjArray) => {
             name: 'ssh',
             message: 'What SSH key do you want to use?',
             choices: hosts,
-            when: () => accObjArray.length > 1 && hosts,
+            when: () => accObjArray.length > 1 && hosts && accObjArray[0].acc !== repoAnswers.acc,
         },
     ]);
 };
 
 module.exports = {
+    orgQuestion,
     repoQuestions,
     sshQuestion,
 };

@@ -8,7 +8,7 @@ const createCDFolder = (newFolderPath, newFolderName) => {
     } else {
         console.log(
             chalk.red('Process aborted! ') +
-                chalk.yellow(`A folder named ${newFolderName} already exists.`)
+                chalk.yellow(`A folder named ${newFolderName} already exists.`),
         );
         process.exit(0);
     }
@@ -21,8 +21,8 @@ const copyGitignore = (gitignoreGlobal) => {
     } else {
         console.log(
             chalk.yellow(
-                `Looks like you don't have ${gitignoreGlobal}. The process will continue without creating one.`
-            )
+                `Looks like you don't have ${gitignoreGlobal}. The process will continue without creating one.`,
+            ),
         );
     }
 };
@@ -33,7 +33,7 @@ const createREADME = (repoAnswers) => {
         .trim()
         .replace(
             /\s+/g,
-            '-'
+            '-',
         )})\n\n# ${repoAnswers.repositoryName.toUpperCase()}\n\n[Go Back to Contents](#contents)\n\n`;
     fs.writeFileSync('README.md', text);
 };

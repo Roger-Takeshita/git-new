@@ -10,12 +10,9 @@ const getGitHubAccounts = () => {
     if (!gitconfigExists) {
         console.log(`${gitconfig} not found. Please create one and try again`);
     } else {
-        const gitconfigAccounts = execSync(
-            'git config --get-regex user[0-9]*.acc',
-            {
-                encoding: 'utf-8',
-            }
-        );
+        const gitconfigAccounts = execSync('git config --get-regex user[0-9]*.acc', {
+            encoding: 'utf-8',
+        });
         const re = /(user([0-9]?)*)/gim;
         const accArray = gitconfigAccounts.match(re);
 
