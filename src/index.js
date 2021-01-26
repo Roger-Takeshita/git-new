@@ -4,10 +4,10 @@ const chalk = require('chalk');
 const os = require('os');
 const path = require('path');
 
-const { repoQuestions, orgQuestion, sshQuestion } = require('./questions/questions');
-const { getGitHubAccounts } = require('./info/info');
-const { createCDFolder, copyGitignore, createREADME } = require('./files/files');
-const { createRemoteRepo, pushFirstCommit } = require('./github/github');
+const { repoQuestions, orgQuestion, sshQuestion } = require('./questions');
+const { getGitHubAccounts } = require('./getInfo');
+const { createCDFolder, copyGitignore, createREADME } = require('./filesAndFolders');
+const { createRemoteRepo, pushFirstCommit } = require('./github');
 
 const createRepo = async () => {
     const gitignoreGlobal = path.join(os.homedir(), '.gitignore_global');
@@ -45,12 +45,14 @@ const createRepo = async () => {
         url = `https://github.com/${repoAnswers.org}/${newFolderName}`;
     }
 
+    console.log();
     console.log(chalk.gray('Account:      ') + chalk.green(`${repoAnswers.acc}`));
     console.log(chalk.gray('Organization: ') + chalk.green(`${repoAnswers.org}`));
     console.log(chalk.gray("Repo's Name:  ") + chalk.green(`${newFolderName}`));
     console.log(chalk.gray('Private:      ') + chalk.green(`${repoAnswers.private}`));
     console.log(chalk.gray('url:          ') + chalk.blue(`${url}`));
     console.log(chalk.green.inverse('All Done!'));
+    console.log();
 
     process.exit(0);
 };

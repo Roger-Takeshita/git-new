@@ -1,8 +1,8 @@
 const inquirer = require('inquirer');
 const path = require('path');
 
-const { getSSHHosts } = require('../info/info');
-const { listOrganizations } = require('../github/github');
+const { getSSHHosts } = require('./getInfo');
+const { listOrganizations } = require('./github');
 
 const orgQuestion = async (repoAnswers, accObjArray) => {
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);

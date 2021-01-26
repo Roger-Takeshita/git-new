@@ -39,8 +39,8 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
         process.exit();
     }
 
-    const octokit = new Octokit({ auth: profile.token });
     try {
+        const octokit = new Octokit({ auth: profile.token });
         if (repoAnswers.org === 'Personal') {
             return await octokit.request('POST /user/repos', {
                 name: newFolderName,
@@ -56,7 +56,8 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
             private: repoAnswers.private === 'true' ? true : false,
         });
     } catch (error) {
-        throw new Error(error);
+        console.log(chalk.red('GitHub ERROR:') + chalk.yellow(` ${error.errors[0].message}`));
+        process.exit();
     }
 };
 

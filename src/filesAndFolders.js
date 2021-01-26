@@ -28,7 +28,7 @@ const copyGitignore = (gitignoreGlobal) => {
 
 const createREADME = (repoAnswers) => {
     console.log(chalk.blue('——————› Creating README.md...'));
-    const text = `<h1 id='contents'>Table of Contents</h1>\n\n- [${repoAnswers.repositoryName.toUpperCase()}](#${repoAnswers.repositoryName
+    const text = `<h1 id='contents'>TABLE OF CONTENTS</h1>\n\n- [${repoAnswers.repositoryName.toUpperCase()}](#${repoAnswers.repositoryName
         .trim()
         .replace(
             /\s+/g,
