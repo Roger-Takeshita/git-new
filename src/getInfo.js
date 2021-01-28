@@ -15,7 +15,7 @@ const getGitHubAccounts = () => {
                 chalk.blue(gitconfig) +
                 chalk.yellow(' not found. Please create one in and try again.'),
         );
-        process.exit();
+        process.exit(1);
     }
 
     try {
@@ -53,19 +53,17 @@ const getGitHubAccounts = () => {
                 chalk.blue('git config --global user.acc "your_github_account"') +
                 chalk.yellow(' and try again.'),
         );
-        process.exit();
+        process.exit(1);
     }
 
     return accObjArray;
 };
 
 const getSSHHosts = (accObjArray) => {
-    console.log(chalk.blue('——————› Getting ssh config file...'));
     if (accObjArray.length > 1) {
         const configPath = path.join(os.homedir(), '.ssh/config');
-        const configExists = fs.existsSync(configPath);
 
-        if (configExists) {
+        if (fs.existsSync(configPath)) {
             const configFile = fs.readFileSync(configPath, 'utf8');
 
             if (configFile) {
@@ -81,12 +79,12 @@ const getSSHHosts = (accObjArray) => {
                     chalk.blue(configPath) +
                     chalk.yellow(' is empty.'),
             );
-            process.exit();
+            process.exit(1);
         }
         console.log(
             chalk.red('ssh ERROR: ') + chalk.blue(configPath) + chalk.yellow(' not found.'),
         );
-        process.exit();
+        process.exit(1);
     }
 
     return null;

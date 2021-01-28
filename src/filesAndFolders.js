@@ -9,31 +9,26 @@ const createCDFolder = (newFolderPath, newFolderName) => {
         console.log(
             chalk.red('ERROR: ') + chalk.yellow(`A folder named ${newFolderName} already exists.`),
         );
-        process.exit();
+        process.exit(1);
     }
 };
 
-const copyGitignore = (gitignoreGlobal) => {
-    console.log(chalk.blue('——————› Copying .gitignore_global...'));
-    if (fs.existsSync(gitignoreGlobal)) {
-        fs.copyFileSync(gitignoreGlobal, '.gitignore');
-    } else {
-        console.log(
-            chalk.yellow(
-                `WARNING: Looks like you don't have ${gitignoreGlobal}. The process will continue without creating a .gitignore file.`,
-            ),
-        );
+const copyGitignore = (gitignoreGlobal, repoAnswers) => {
+    if (repoAnswers.gitignore) {
+        if (fs.existsSync(gitignoreGlobal)) {
+            fs.copyFileSync(gitignoreGlobal, '.gitignore');
+        } else {
+            console.log(
+                chalk.yellow(
+                    `WARNING: Looks like you don't have ${gitignoreGlobal}. The process will continue without creating a .gitignore file.`,
+                ),
+            );
+        }
     }
 };
 
 const createREADME = (repoAnswers) => {
-    console.log(chalk.blue('——————› Creating README.md...'));
-    const text = `<h1 id='contents'>TABLE OF CONTENTS</h1>\n\n- [${repoAnswers.repositoryName.toUpperCase()}](#${repoAnswers.repositoryName
-        .trim()
-        .replace(
-            /\s+/g,
-            '-',
-        )})\n\n# ${repoAnswers.repositoryName.toUpperCase()}\n\n[Go Back to Contents](#contents)\n\n`;
+    const text = `# ${repoAnswers.repositoryName.toUpperCase()}\n\n`;
     fs.writeFileSync('README.md', text);
 };
 

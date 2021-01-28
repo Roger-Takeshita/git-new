@@ -36,11 +36,16 @@ const repoQuestions = async (accNameArray, accObjArray) => {
             default: path.basename(process.cwd()),
         },
         {
-            type: 'list',
+            type: 'confirm',
             name: 'private',
-            message: 'Is this a Private repository?',
-            choices: ['true', 'false'],
-            default: 'true',
+            message: 'Is this a private repository?',
+            default: true,
+        },
+        {
+            type: 'confirm',
+            name: 'gitignore',
+            message: 'Do you want to add a .gitignore file?',
+            default: true,
         },
     ]);
 

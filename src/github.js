@@ -11,7 +11,7 @@ const listOrganizations = async (profile) => {
                     chalk.blue('git config --global user.token "your_github_personal_token"') +
                     chalk.yellow(' and try again.'),
             );
-            process.exit();
+            process.exit(1);
         }
 
         const octokit = new Octokit({ auth: profile.token });
@@ -25,8 +25,8 @@ const listOrganizations = async (profile) => {
     }
 };
 
+// eslint-disable-next-line consistent-return
 const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
-    console.log(chalk.blue('——————› Creating GitHub repository...'));
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
 
     if (profile.token === '') {
@@ -36,7 +36,7 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
                 chalk.blue('git config --global user.token "your_github_personal_token"') +
                 chalk.yellow(' and try again.'),
         );
-        process.exit();
+        process.exit(1);
     }
 
     try {
@@ -44,25 +44,21 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
         if (repoAnswers.org === 'Personal') {
             return await octokit.request('POST /user/repos', {
                 name: newFolderName,
-                // eslint-disable-next-line no-unneeded-ternary
-                private: repoAnswers.private === 'true' ? true : false,
+                private: repoAnswers.private,
             });
         }
-
         return await octokit.request('POST /orgs/{org}/repos', {
             org: repoAnswers.org,
             name: newFolderName,
-            // eslint-disable-next-line no-unneeded-ternary
-            private: repoAnswers.private === 'true' ? true : false,
+            private: repoAnswers.private,
         });
     } catch (error) {
         console.log(chalk.red('GitHub ERROR:') + chalk.yellow(` ${error.errors[0].message}`));
-        process.exit();
+        process.exit(1);
     }
 };
 
 const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
-    console.log(chalk.blue('——————› Pushing first commit...'));
     execSync('git init && git add . && git commit -m "First Commit"');
     execSync('git branch -M main');
 
@@ -86,6 +82,7 @@ const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
         );
     }
 
+    console.log();
     execSync('git push -u origin main');
 };
 

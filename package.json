@@ -26,5 +26,20 @@
         "eslint": "^7.18.0",
         "eslint-config-airbnb-base": "^14.2.1",
         "eslint-plugin-import": "^2.22.1"
-    }
+    },
+    "keywords": [
+        "create",
+        "init",
+        "git",
+        "gh",
+        "github",
+        "repo",
+        "repository",
+        "personal",
+        "organization",
+        "command",
+        "cli",
+        "push",
+        "commit"
+    ]
 }

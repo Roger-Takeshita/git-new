@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 const chalk = require('chalk');
 const os = require('os');
@@ -32,7 +32,7 @@ const createRepo = async () => {
     const newFolderPath = path.join(process.cwd(), newFolderName);
 
     createCDFolder(newFolderPath, newFolderName);
-    copyGitignore(gitignoreGlobal, newFolderPath);
+    copyGitignore(gitignoreGlobal, repoAnswers);
     createREADME(repoAnswers);
 
     await createRemoteRepo(repoAnswers, newFolderName, accObjArray);
@@ -48,9 +48,10 @@ const createRepo = async () => {
     console.log();
     console.log(chalk.gray('Account:      ') + chalk.green(`${repoAnswers.acc}`));
     console.log(chalk.gray('Organization: ') + chalk.green(`${repoAnswers.org}`));
-    console.log(chalk.gray("Repo's Name:  ") + chalk.green(`${newFolderName}`));
+    console.log(chalk.gray('Repo Name:    ') + chalk.green(`${newFolderName}`));
     console.log(chalk.gray('Private:      ') + chalk.green(`${repoAnswers.private}`));
-    console.log(chalk.gray('url:          ') + chalk.blue(`${url}`));
+    console.log(chalk.gray('Url:          ') + chalk.blue(`${url}`));
+    console.log();
     console.log(chalk.green.inverse('All Done!'));
     console.log();
 
