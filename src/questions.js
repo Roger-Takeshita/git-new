@@ -2,7 +2,9 @@ const inquirer = require('inquirer');
 const path = require('path');
 
 const { getSSHHosts } = require('./getInfo');
-const { listOrganizations } = require('./github');
+const { listGitignore, listOrganizations } = require('./github');
+
+inquirer.registerPrompt('search-list', require('inquirer-search-list'));
 
 const orgQuestion = async (repoAnswers, accObjArray) => {
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
@@ -21,6 +23,7 @@ const orgQuestion = async (repoAnswers, accObjArray) => {
 };
 
 const repoQuestions = async (accNameArray, accObjArray) => {
+    const gitIgnoreArray = await listGitignore();
     const answers = await inquirer.prompt([
         {
             type: 'list',
@@ -43,9 +46,16 @@ const repoQuestions = async (accNameArray, accObjArray) => {
         },
         {
             type: 'confirm',
-            name: 'gitignore',
+            name: 'gitignoreConfirm',
             message: 'Do you want to add a .gitignore file?',
             default: true,
+        },
+        {
+            type: 'search-list',
+            name: 'gitignore',
+            message: 'What type of .gitignore do you want to use?',
+            choices: gitIgnoreArray,
+            when: (prevAnswer) => prevAnswer.gitignoreConfirm,
         },
     ]);
 

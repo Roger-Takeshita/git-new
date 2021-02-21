@@ -32,7 +32,7 @@ const createRepo = async () => {
     const newFolderPath = path.join(process.cwd(), newFolderName);
 
     createCDFolder(newFolderPath, newFolderName);
-    copyGitignore(gitignoreGlobal, repoAnswers);
+    await copyGitignore(gitignoreGlobal, repoAnswers, newFolderPath);
     createREADME(repoAnswers);
 
     await createRemoteRepo(repoAnswers, newFolderName, accObjArray);

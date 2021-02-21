@@ -2,6 +2,21 @@ const { Octokit } = require('@octokit/core');
 const chalk = require('chalk');
 const { execSync } = require('child_process');
 
+// eslint-disable-next-line consistent-return
+const listGitignore = async () => {
+    try {
+        const octokit = new Octokit();
+        const response = await octokit.request('GET /gitignore/templates');
+        const gitIgnoreArray = response.data;
+        gitIgnoreArray.unshift('gitignore_global');
+
+        return gitIgnoreArray;
+    } catch (error) {
+        console.log(chalk.red('GitHub ERROR:') + chalk.yellow(` ${error.errors[0].message}`));
+        process.exit(1);
+    }
+};
+
 const listOrganizations = async (profile) => {
     try {
         if (profile.token === '') {
@@ -87,6 +102,7 @@ const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
 };
 
 module.exports = {
+    listGitignore,
     createRemoteRepo,
     pushFirstCommit,
     listOrganizations,

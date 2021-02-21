@@ -1,6 +1,6 @@
 {
     "name": "git-new",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Create a new GitHub repository",
     "main": "src/index.js",
     "scripts": {
@@ -19,8 +19,10 @@
     "homepage": "https://github.com/Roger-Takeshita/git-new#readme",
     "dependencies": {
         "@octokit/core": "^3.2.4",
+        "axios": "^0.21.1",
         "chalk": "^4.1.0",
-        "inquirer": "^7.3.3"
+        "inquirer": "^7.3.3",
+        "inquirer-search-list": "^1.2.6"
     },
     "devDependencies": {
         "eslint": "^7.18.0",
