@@ -1,19 +1,20 @@
-# git-new
+## Description
 
-Easy way to create a new repository (personal/organization) on GitHub (only) using the terminal.
+Creates a new GitHub repository only using terminal.
 
 ## What's the purpose?
 
-Creates a new GitHub repository only using the terminal.
+Easy way to create a new repository (personal/organization) on GitHub using only the terminal.
 
 ## What does it do?
 
 1. Creates a new local folder
 2. Initialize a git repository (`git init`)
-3. Saves a copy of your `.gitignore_global` as `.gitignore` in your new folder (if `.gitignore_global` exists).
-4. Creates a `README.md` file
-5. Creates a GitHub repository
-6. Pushes the first commit to the `main` branch
+3. Creates a `.gitignore` file (optional)
+4. Creates a `LiCENSE` file (optional)
+5. Creates a `README.md` file
+6. Creates a GitHub repository
+7. Pushes first commit to the `main` branch
 
 ## Installation
 
@@ -23,62 +24,68 @@ Creates a new GitHub repository only using the terminal.
 
 ## How to use?
 
-- On your `terminal`:
+On your `terminal`:
 
-  ```Bash
-    git-new # without any arguments
-  ```
+```Bash
+  git-new
 
-  - `Y/N` questions, if no answer is given, the default value is `True`
-  - All the white spaces in repo's name will be replaced with `_`
+  # or
+
+  git-new your repo name --private
+```
+
+- `Y/N` questions, if no answer is given, the default value is `True`
+- All the white spaces in repo's name will be replaced with `_` (e.g `your_repo_name`)
 
 ## How to configure?
 
-- **Single GitHub Account**
+**Single GitHub Account**
 
-  - If you only have one account, you will need:
-    - Create a [Personal Access Token](https://github.com/settings/tokens)
-    - Add GitHub `account` and `token` to `.gitconfig` file
+- If you only have one account, you will need:
+  - Create a [Personal Access Token](https://github.com/settings/tokens)
+  - Add GitHub `account` and `token` to `.gitconfig` file
 
-- **Multiple GitHub Accounts**
+**Multiple GitHub Accounts**
 
-  - To use with multiple GitHub accounts, you will need:
-    - Create a new SSH key
-      - Config GitHub to use the new SSH public key
-      - Config ssh `config` file
-    - Create a [Personal Access Token](https://github.com/settings/tokens)
-      - Add new GitHub `account` and `token` to `.gitconfig` file
+- To use with multiple GitHub accounts, you will need:
+  - Create a new SSH key
+    - Config GitHub to use the new SSH public key
+    - Config ssh `config` file
+  - Create a [Personal Access Token](https://github.com/settings/tokens)
+    - Add new GitHub `account` and `token` to `.gitconfig` file
 
 ### Single GitHub Account Config
 
-![](https://i.imgur.com/4t6aHDr.png)
+![](https://i.imgur.com/HJxQ9V3.png)
 
-- Personal Access Token
+![](https://i.imgur.com/1mMyXC6.png)
 
-  1. Create a GitHub [personal access token](https://github.com/settings/tokens)
+**Personal Access Token**
 
-     ![](https://i.imgur.com/lfBfnut.png)
+1. Create a GitHub [personal access token](https://github.com/settings/tokens)
 
-  2. Add your GitHub `account` and `token` to your `gitconfig` file
+   ![](https://i.imgur.com/lfBfnut.png)
+
+2. Add your GitHub `account` and `token` to your `gitconfig` file
+
+   ```Bash
+     git config --global user.acc "your_github_acc"
+     git config --global user.token "243f93cd40c14c9dd16e29bfff73b6aa5384285e"
+   ```
+
+   - In `/Users/<your_username>/.gitconfig`, you will have:
 
      ```Bash
-       git config --global user.acc "your_github_acc"
-       git config --global user.token "243f93cd40c14c9dd16e29bfff73b6aa5384285e"
+       [user]
+           name = your_name
+           email = your_email@gmail.com
+           acc = your_github_acc
+           token = 243f93cd40c14c9dd16e29bfff73b6aa5384285e
      ```
-
-     - In `/Users/<your_username>/.gitconfig`, you will have:
-
-       ```Bash
-         [user]
-             name = your_name
-             email = your_email@gmail.com
-             acc = your_github_acc
-             token = 243f93cd40c14c9dd16e29bfff73b6aa5384285e
-       ```
 
 ### Multiple GitHub Accounts Config
 
-![](https://i.imgur.com/m3atLvD.png)
+![](https://i.imgur.com/5qJrDF9.png)
 
 #### Create New SSH Key
 
@@ -141,14 +148,14 @@ Creates a new GitHub repository only using the terminal.
 
    - Add the the new ssh key to your ssh list
 
-   ```Bash
-     ssh-add /Users/<your_username>/.ssh/id_rsa_dev
+     ```Bash
+       ssh-add /Users/<your_username>/.ssh/id_rsa_dev
 
-     # Enter passphrase for /Users/<your_username>/.ssh/id_rsa_dev:
-     your_password
+       # Enter passphrase for /Users/<your_username>/.ssh/id_rsa_dev:
+       your_password
 
-     # Identity added: /Users/<your_username>/.ssh/id_rsa_dev (your_email@gmail.com)
-   ```
+       # Identity added: /Users/<your_username>/.ssh/id_rsa_dev (your_email@gmail.com)
+     ```
 
 4. Configure ssh `config` file
 
@@ -165,39 +172,39 @@ Creates a new GitHub repository only using the terminal.
 
 #### Configure GitHub
 
-- Add a second profile (`user1`) to your `.gitconfig` file
+Add a second profile (`user1`) to your `.gitconfig` file
 
-  - the `user1` will the name of the profile
-    - the name of the profile has to start with `user` and followed by an unique `number` (eg. `user1`, `user2`...)
-  - Create a [Personal Access Token](#single-gitHub-account-config)
-  - Add a new user to `.gitconfig` file
-
-    ```Bash
-      git config --global user1.name "your_name"
-      #                       ^
-      #                       └── user1 (user One)
-      git config --global user1.email "your_second_email@gmail.com"
-      #                       ^
-      #                       └── user1 (user One)
-      git config --global user1.acc "your_second_github_acc"
-      #                       ^
-      #                       └── user1 (user One)
-      git config --global user1.token "243f93cd40c14c9dd16e29bfff73b6aa5384285e"
-      #                       ^
-      #                       └── user1 (user One)
-    ```
-
-- In your `/Users/<your_username>/.gitconfig`:
+- the `user1` will the name of the profile
+  - the name of the profile has to start with `user` and followed by an unique `number` (eg. `user1`, `user2`...)
+- Create a [Personal Access Token](https://github.com/settings/tokens)
+- Add a new user to `.gitconfig` file
 
   ```Bash
-    [user] # <-------- Default profile
-        name = your_name
-        email = your_email@gmail.com
-        acc = your_github_acc
-        token = 243f93cd40c14c9dd16e29bfff73b6aa5384285e
-    [user1] # <-------- New profile
-        name = your_name
-        email = your_second_email@gmail.com
-        acc = your_second_github_acc
-        token = 243f93cd40c14c9dd16e29bfff73b6aa5384285e
+    git config --global user1.name "your_name"
+    #                       ^
+    #                       └── user1 (user One)
+    git config --global user1.email "your_second_email@gmail.com"
+    #                       ^
+    #                       └── user1 (user One)
+    git config --global user1.acc "your_second_github_acc"
+    #                       ^
+    #                       └── user1 (user One)
+    git config --global user1.token "243f93cd40c14c9dd16e29bfff73b6aa5384285e"
+    #                       ^
+    #                       └── user1 (user One)
   ```
+
+In your `/Users/<your_username>/.gitconfig`:
+
+```Bash
+  [user] # <-------- Default profile
+      name = your_name
+      email = your_email@gmail.com
+      acc = your_github_acc
+      token = 243f93cd40c14c9dd16e29bfff73b6aa5384285e
+  [user1] # <-------- New profile
+      name = your_name
+      email = your_second_email@gmail.com
+      acc = your_second_github_acc
+      token = 243f93cd40c14c9dd16e29bfff73b6aa5384285e
+```
