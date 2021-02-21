@@ -3,21 +3,19 @@ const chalk = require('chalk');
 const { execSync } = require('child_process');
 
 // eslint-disable-next-line consistent-return
-const listGitignore = async () => {
-    try {
-        const octokit = new Octokit();
-        const response = await octokit.request('GET /gitignore/templates');
-        const gitIgnoreArray = response.data;
-        gitIgnoreArray.unshift('gitignore_global');
+const getGithubData = async (url) => {
+    const octokit = new Octokit();
 
-        return gitIgnoreArray;
+    try {
+        const response = await octokit.request(url);
+        return response;
     } catch (error) {
         console.log(chalk.red('GitHub ERROR:') + chalk.yellow(` ${error.errors[0].message}`));
         process.exit(1);
     }
 };
 
-const listOrganizations = async (profile) => {
+const getOrganizations = async (profile) => {
     try {
         if (profile.token === '') {
             console.log(
@@ -102,8 +100,8 @@ const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
 };
 
 module.exports = {
-    listGitignore,
+    getGithubData,
+    getOrganizations,
     createRemoteRepo,
     pushFirstCommit,
-    listOrganizations,
 };

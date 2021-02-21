@@ -2,13 +2,13 @@ const inquirer = require('inquirer');
 const path = require('path');
 
 const { getSSHHosts } = require('./getInfo');
-const { listGitignore, listOrganizations } = require('./github');
+const { getGithubData, getOrganizations } = require('./github');
 
 inquirer.registerPrompt('search-list', require('inquirer-search-list'));
 
 const orgQuestion = async (repoAnswers, accObjArray) => {
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
-    const orgArray = await listOrganizations(profile);
+    const orgArray = await getOrganizations(profile);
     const answers = await inquirer.prompt([
         {
             type: 'list',
@@ -23,20 +23,25 @@ const orgQuestion = async (repoAnswers, accObjArray) => {
 };
 
 const repoQuestions = async (accNameArray, accObjArray) => {
-    const gitIgnoreArray = await listGitignore();
+    const gitIgnoreArray = await getGithubData('GET /gitignore/templates');
+    const licenseArray = await getGithubData('GET /licenses');
+    const onlyGitIgnoreArray = gitIgnoreArray.data;
+    onlyGitIgnoreArray.unshift('gitignore_global');
+    const onlyLicenseArray = licenseArray.data.map((item) => item.spdx_id);
+
     const answers = await inquirer.prompt([
-        {
-            type: 'list',
-            name: 'acc',
-            message: 'What GitHub account do you want to use?',
-            choices: accNameArray,
-            when: () => accObjArray.length > 1,
-        },
         {
             type: 'text',
             name: 'repositoryName',
             message: 'What is the name of the repository/project?',
             default: path.basename(process.cwd()),
+        },
+        {
+            type: 'list',
+            name: 'acc',
+            message: 'Which GitHub account do you want to use?',
+            choices: accNameArray,
+            when: () => accObjArray.length > 1,
         },
         {
             type: 'confirm',
@@ -54,8 +59,21 @@ const repoQuestions = async (accNameArray, accObjArray) => {
             type: 'search-list',
             name: 'gitignore',
             message: 'What type of .gitignore do you want to use?',
-            choices: gitIgnoreArray,
+            choices: onlyGitIgnoreArray,
             when: (prevAnswer) => prevAnswer.gitignoreConfirm,
+        },
+        {
+            type: 'confirm',
+            name: 'licenseConfirm',
+            message: 'Do you want to add a LICENSE file?',
+            default: true,
+        },
+        {
+            type: 'search-list',
+            name: 'license',
+            message: 'What type of LICENSE do you want to use?',
+            choices: onlyLicenseArray,
+            when: (prevAnswer) => prevAnswer.licenseConfirm,
         },
     ]);
 

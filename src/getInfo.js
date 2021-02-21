@@ -26,25 +26,23 @@ const getGitHubAccounts = () => {
         const accArray = gitconfigAccounts.match(re);
 
         accObjArray = accArray.map((profile) => {
-            let acc = '';
-            let token = '';
+            const user = {};
 
             try {
-                acc = execSync(`git config ${profile}.acc`, {
+                user.acc = execSync(`git config ${profile}.acc`, {
                     encoding: 'utf-8',
                 }).replace('\n', '');
-                token = execSync(`git config ${profile}.token`, {
+                user.name = execSync(`git config ${profile}.name`, {
+                    encoding: 'utf-8',
+                }).replace('\n', '');
+                user.token = execSync(`git config ${profile}.token`, {
                     encoding: 'utf-8',
                 }).replace('\n', '');
             } catch (error) {
                 // empty
             }
 
-            return {
-                acc,
-                token,
-                profile,
-            };
+            return user;
         });
     } catch (error) {
         console.log(

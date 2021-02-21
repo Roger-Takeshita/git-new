@@ -6,7 +6,7 @@ const path = require('path');
 
 const { repoQuestions, orgQuestion, sshQuestion } = require('./questions');
 const { getGitHubAccounts } = require('./getInfo');
-const { createCDFolder, copyGitignore, createREADME } = require('./filesAndFolders');
+const { createCDFolder, createGitignoreLicense, createREADME } = require('./filesAndFolders');
 const { createRemoteRepo, pushFirstCommit } = require('./github');
 
 const createRepo = async () => {
@@ -32,7 +32,7 @@ const createRepo = async () => {
     const newFolderPath = path.join(process.cwd(), newFolderName);
 
     createCDFolder(newFolderPath, newFolderName);
-    await copyGitignore(gitignoreGlobal, repoAnswers, newFolderPath);
+    await createGitignoreLicense(gitignoreGlobal, repoAnswers, newFolderPath, accObjArray);
     createREADME(repoAnswers);
 
     await createRemoteRepo(repoAnswers, newFolderName, accObjArray);

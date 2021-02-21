@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const fs = require('fs');
 const axios = require('axios');
+const { getGithubData } = require('./github');
 
 const createCDFolder = (newFolderPath, newFolderName) => {
     if (!fs.existsSync(newFolderPath)) {
@@ -14,7 +15,7 @@ const createCDFolder = (newFolderPath, newFolderName) => {
     }
 };
 
-const copyGitignore = async (gitignoreGlobal, repoAnswers, newFolderPath) => {
+const createGitignoreLicense = async (gitignoreGlobal, repoAnswers, newFolderPath, accObjArray) => {
     try {
         if (repoAnswers.gitignoreConfirm) {
             if (repoAnswers.gitignore === 'gitignore_global') {
@@ -28,13 +29,22 @@ const copyGitignore = async (gitignoreGlobal, repoAnswers, newFolderPath) => {
                     );
                 }
             } else {
-                const response = await axios({
+                const response1 = await axios({
                     method: 'GET',
                     url: `https://raw.githubusercontent.com/github/gitignore/master/${repoAnswers.gitignore}.gitignore`,
                 });
 
-                fs.writeFileSync(`${newFolderPath}/.gitignore`, response.data);
+                fs.writeFileSync(`${newFolderPath}/.gitignore`, response1.data);
             }
+        }
+        if (repoAnswers.licenseConfirm) {
+            const response2 = await getGithubData(`GET /licenses/${repoAnswers.license}`);
+            const user = accObjArray.find((u) => u.acc === repoAnswers.acc);
+            const date = new Date();
+            const license = response2.data.body
+                .replace(/\[year\]/gm, date.getFullYear())
+                .replace(/\[fullname\]/gm, user.name);
+            fs.writeFileSync(`${newFolderPath}/LICENSE`, license);
         }
     } catch (error) {
         console.log(error);
@@ -48,6 +58,6 @@ const createREADME = (repoAnswers) => {
 
 module.exports = {
     createCDFolder,
-    copyGitignore,
+    createGitignoreLicense,
     createREADME,
 };
