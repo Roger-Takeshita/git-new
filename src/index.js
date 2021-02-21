@@ -9,12 +9,17 @@ const { getGitHubAccounts } = require('./getInfo');
 const { createCDFolder, createGitignoreLicense, createREADME } = require('./filesAndFolders');
 const { createRemoteRepo, pushFirstCommit } = require('./github');
 
-const createRepo = async () => {
+const createRepoMenu = async (repositoryName, privateFlag) => {
     const gitignoreGlobal = path.join(os.homedir(), '.gitignore_global');
     const accObjArray = getGitHubAccounts();
     const accNameArray = accObjArray.map((profile) => profile.acc);
-    const repoAnswers = await repoQuestions(accNameArray, accObjArray);
+    const repoAnswers = await repoQuestions(accNameArray, accObjArray, repositoryName);
     let url = '';
+
+    if (repositoryName) {
+        repoAnswers.repositoryName = repositoryName;
+        repoAnswers.private = privateFlag;
+    }
 
     if (!Object.prototype.hasOwnProperty.call(repoAnswers, 'acc')) {
         repoAnswers.acc = accObjArray[0].acc;
@@ -49,7 +54,11 @@ const createRepo = async () => {
     console.log(chalk.gray('Account:      ') + chalk.green(`${repoAnswers.acc}`));
     console.log(chalk.gray('Organization: ') + chalk.green(`${repoAnswers.org}`));
     console.log(chalk.gray('Repo Name:    ') + chalk.green(`${newFolderName}`));
-    console.log(chalk.gray('Private:      ') + chalk.green(`${repoAnswers.private}`));
+    if (repoAnswers.private) {
+        console.log(chalk.gray('Private:      ') + chalk.green(`${repoAnswers.private}`));
+    } else {
+        console.log(chalk.gray('Private:      ') + chalk.red(`${repoAnswers.private}`));
+    }
     console.log(chalk.gray('Url:          ') + chalk.blue(`${url}`));
     console.log();
     console.log(chalk.green.inverse('All Done!'));
@@ -58,4 +67,27 @@ const createRepo = async () => {
     process.exit(0);
 };
 
-createRepo();
+const init = () => {
+    if (process.argv.length > 2) {
+        const args = process.argv;
+        const newArgs = args.slice(2, args.length);
+        const repoNameArray = [];
+        let privateFlag = false;
+
+        for (let i = 0; i < newArgs.length; i += 1) {
+            if (newArgs[i] !== '--private' && newArgs[i] !== '-p') {
+                repoNameArray.push(newArgs[i]);
+            } else {
+                privateFlag = true;
+            }
+        }
+
+        const repositoryName = repoNameArray.join('_');
+
+        createRepoMenu(repositoryName, privateFlag);
+    } else {
+        createRepoMenu();
+    }
+};
+
+init();

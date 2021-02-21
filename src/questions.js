@@ -22,7 +22,7 @@ const orgQuestion = async (repoAnswers, accObjArray) => {
     return answers;
 };
 
-const repoQuestions = async (accNameArray, accObjArray) => {
+const repoQuestions = async (accNameArray, accObjArray, repositoryName) => {
     const gitIgnoreArray = await getGithubData('GET /gitignore/templates');
     const licenseArray = await getGithubData('GET /licenses');
     const onlyGitIgnoreArray = gitIgnoreArray.data;
@@ -35,6 +35,7 @@ const repoQuestions = async (accNameArray, accObjArray) => {
             name: 'repositoryName',
             message: 'What is the name of the repository/project?',
             default: path.basename(process.cwd()),
+            when: () => !repositoryName,
         },
         {
             type: 'list',
@@ -48,6 +49,7 @@ const repoQuestions = async (accNameArray, accObjArray) => {
             name: 'private',
             message: 'Is this a private repository?',
             default: true,
+            when: () => !repositoryName,
         },
         {
             type: 'confirm',
@@ -86,7 +88,7 @@ const sshQuestion = async (accObjArray, repoAnswers) => {
         {
             type: 'list',
             name: 'ssh',
-            message: 'What SSH key do you want to use?',
+            message: 'Which SSH key do you want to use?',
             choices: hosts,
             when: () => accObjArray.length > 1 && hosts && accObjArray[0].acc !== repoAnswers.acc,
         },
