@@ -1,9 +1,9 @@
-const fs = require('fs');
 const axios = require('axios');
+const fs = require('fs');
 const { getGithubData } = require('./github');
-const { errorMsg, warningMsg } = require('./shared');
+const { errorMsg, warningMsg } = require('./msg');
 
-const createCDFolder = (newFolderPath, newFolderName) => {
+const createFolder = (newFolderPath, newFolderName) => {
     if (!fs.existsSync(newFolderPath)) {
         fs.mkdirSync(newFolderPath);
         process.chdir(newFolderPath);
@@ -55,7 +55,7 @@ const createREADME = (repoAnswers) => {
 };
 
 module.exports = {
-    createCDFolder,
+    createFolder,
     createGitignoreLicense,
     createREADME,
 };

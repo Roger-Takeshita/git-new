@@ -1,8 +1,8 @@
 const inquirer = require('inquirer');
 const path = require('path');
-const { errorMsg } = require('./shared');
+const { errorMsg } = require('./msg');
 
-const { getSSHHosts } = require('./getInfo');
+const { getSSHHosts } = require('./getSSHHosts');
 const { getGithubData, getOrganizations } = require('./github');
 
 inquirer.registerPrompt('search-list', require('inquirer-search-list'));

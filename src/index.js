@@ -5,10 +5,9 @@ const os = require('os');
 const path = require('path');
 
 const { repoQuestions, orgQuestion, sshQuestion } = require('./questions');
-const { getGitHubAccounts } = require('./getInfo');
-const { createCDFolder, createGitignoreLicense, createREADME } = require('./filesAndFolders');
-const { createRemoteRepo, pushFirstCommit } = require('./github');
-const { errorMsg } = require('./shared');
+const { createFolder, createGitignoreLicense, createREADME } = require('./filesAndFolders');
+const { getGitHubAccounts, createRemoteRepo, pushFirstCommit } = require('./github');
+const { errorMsg } = require('./msg');
 
 const createRepoMenu = async (repositoryName, privateFlag) => {
     try {
@@ -38,7 +37,7 @@ const createRepoMenu = async (repositoryName, privateFlag) => {
         const newFolderName = repoAnswers.repositoryName.trim().replace(/\s+/g, '_');
         const newFolderPath = path.join(process.cwd(), newFolderName);
 
-        createCDFolder(newFolderPath, newFolderName);
+        createFolder(newFolderPath, newFolderName);
         await createGitignoreLicense(gitignoreGlobal, repoAnswers, newFolderPath, accObjArray);
         createREADME(repoAnswers);
 
