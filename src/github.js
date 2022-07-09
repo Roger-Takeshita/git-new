@@ -1,30 +1,27 @@
 const { Octokit } = require('@octokit/core');
 const chalk = require('chalk');
 const { execSync } = require('child_process');
+const { errorMsg } = require('./shared');
 
-// eslint-disable-next-line consistent-return
 const getGithubData = async (url) => {
     const octokit = new Octokit();
 
     try {
-        const response = await octokit.request(url);
-        return response;
+        return await octokit.request(url);
     } catch (error) {
-        console.log(chalk.red('GitHub ERROR:') + chalk.yellow(` ${error.errors[0].message}`));
-        process.exit(1);
+        errorMsg('GitHub ERROR', error.message);
     }
 };
 
 const getOrganizations = async (profile) => {
     try {
         if (profile.token === '') {
-            console.log(
-                chalk.red('.gitconfig ERROR:') +
-                    chalk.yellow(' user.token not found. Please add a token using the command ') +
+            errorMsg(
+                '.gitconfig ERROR',
+                chalk.yellow(' user.token not found. Please add a token using the command ') +
                     chalk.blue('git config --global user.token "your_github_personal_token"') +
                     chalk.yellow(' and try again.'),
             );
-            process.exit(1);
         }
 
         const octokit = new Octokit({ auth: profile.token });
@@ -34,22 +31,20 @@ const getOrganizations = async (profile) => {
 
         return orgNamesArray;
     } catch (error) {
-        throw new Error(error);
+        errorMsg('GitHub ERROR', error.message);
     }
 };
 
-// eslint-disable-next-line consistent-return
 const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
     const profile = accObjArray.find((prof) => prof.acc === repoAnswers.acc);
 
     if (profile.token === '') {
-        console.log(
-            chalk.red('.gitconfig ERROR:') +
-                chalk.yellow(' user.token not found. Please add a token using the command ') +
+        errorMsg(
+            '.gitconfig ERROR',
+            chalk.yellow(' user.token not found. Please add a token using the command ') +
                 chalk.blue('git config --global user.token "your_github_personal_token"') +
                 chalk.yellow(' and try again.'),
         );
-        process.exit(1);
     }
 
     try {
@@ -66,23 +61,30 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
             private: repoAnswers.private,
         });
     } catch (error) {
-        console.log(chalk.red('GitHub ERROR:') + chalk.yellow(` ${error.errors[0].message}`));
-        process.exit(1);
+        errorMsg('GitHub ERROR', error.errors[0].message);
     }
 };
 
 const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
-    execSync('git init && git add . && git commit -m "First Commit"');
-    execSync('git branch -M main');
+    let pushCommit = false;
+
+    if (repoAnswers.gitignoreConfirm || repoAnswers.readmeConfirm || repoAnswers.licenseConfirm) {
+        pushCommit = true;
+    }
+
+    if (pushCommit) {
+        execSync('git init && git add . && git commit -m "First Commit"');
+        execSync('git branch -M main');
+    }
 
     if (Object.prototype.hasOwnProperty.call(sshAnswers, 'ssh')) {
         if (repoAnswers.org === 'Personal') {
             execSync(
-                `git remote add origin git@${sshAnswers.ssh}:/${repoAnswers.acc}/${newFolderName}.git`,
+                `git remote add origin git@${sshAnswers.ssh}:${repoAnswers.acc}/${newFolderName}.git`,
             );
         } else {
             execSync(
-                `git remote add origin git@${sshAnswers.ssh}:/${repoAnswers.org}/${newFolderName}.git`,
+                `git remote add origin git@${sshAnswers.ssh}:${repoAnswers.org}/${newFolderName}.git`,
             );
         }
     } else if (repoAnswers.org === 'Personal') {
@@ -95,8 +97,10 @@ const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
         );
     }
 
-    console.log();
-    execSync('git push -u origin main');
+    if (pushCommit) {
+        console.log();
+        execSync('git push -u origin main');
+    }
 };
 
 module.exports = {

@@ -1,31 +1,27 @@
-const chalk = require('chalk');
 const fs = require('fs');
 const axios = require('axios');
 const { getGithubData } = require('./github');
+const { errorMsg, warningMsg } = require('./shared');
 
 const createCDFolder = (newFolderPath, newFolderName) => {
     if (!fs.existsSync(newFolderPath)) {
         fs.mkdirSync(newFolderPath);
         process.chdir(newFolderPath);
     } else {
-        console.log(
-            chalk.red('ERROR: ') + chalk.yellow(`A folder named ${newFolderName} already exists.`),
-        );
-        process.exit(1);
+        errorMsg('ERROR', `A folder named ${newFolderName} already exists.`);
     }
 };
 
 const createGitignoreLicense = async (gitignoreGlobal, repoAnswers, newFolderPath, accObjArray) => {
     try {
         if (repoAnswers.gitignoreConfirm) {
-            if (repoAnswers.gitignore === 'gitignore_global') {
+            if (repoAnswers.gitignore === 'gitignore') {
                 if (fs.existsSync(gitignoreGlobal)) {
                     fs.copyFileSync(gitignoreGlobal, '.gitignore');
                 } else {
-                    console.log(
-                        chalk.yellow(
-                            `WARNING: Looks like you don't have ${gitignoreGlobal}. The process will continue without creating a .gitignore file.`,
-                        ),
+                    warningMsg(
+                        'WARNING',
+                        `Looks like you don't have ${gitignoreGlobal}. The process will continue without creating a .gitignore file.`,
                     );
                 }
             } else {
@@ -47,13 +43,15 @@ const createGitignoreLicense = async (gitignoreGlobal, repoAnswers, newFolderPat
             fs.writeFileSync(`${newFolderPath}/LICENSE`, license);
         }
     } catch (error) {
-        console.log(error);
+        errorMsg('GitHub ERROR', error.message);
     }
 };
 
 const createREADME = (repoAnswers) => {
-    const text = `# ${repoAnswers.repositoryName.toUpperCase()}\n\n`;
-    fs.writeFileSync('README.md', text);
+    if (repoAnswers.readmeConfirm) {
+        const text = `# ${repoAnswers.repositoryName.toUpperCase()}\n\n`;
+        fs.writeFileSync('README.md', text);
+    }
 };
 
 module.exports = {
