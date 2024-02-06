@@ -12,7 +12,7 @@ Easy way to create a new repository (personal/organization) on GitHub using only
 2. Initialize a git repository (`git init`)
 3. Creates a `.gitignore` file (optional)
 4. Creates a `LiCENSE` file (optional)
-5. Creates a `README.md` file
+5. Creates a `README.md` file (optional)
 6. Creates a GitHub repository
 7. Pushes first commit to the `main` branch
 
@@ -30,8 +30,10 @@ On your `terminal`:
   git-new
 
   # or
+  git-new <your_repo_name>
 
-  git-new your repo name --private
+  # or
+  git-new <your_repo_name> --private
 ```
 
 - `Y/N` questions, if no answer is given, the default value is `True`

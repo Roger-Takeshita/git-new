@@ -119,14 +119,29 @@ const createRemoteRepo = async (repoAnswers, newFolderName, accObjArray) => {
 };
 
 const pushFirstCommit = async (repoAnswers, newFolderName, sshAnswers) => {
+    const files = [];
+    let filesStr = '';
     let pushCommit = false;
 
     if (repoAnswers.gitignoreConfirm || repoAnswers.readmeConfirm || repoAnswers.licenseConfirm) {
+        if (repoAnswers.gitignoreConfirm) files.push('.gitignore');
+        if (repoAnswers.licenseConfirm) files.push('LICENSE');
+        if (repoAnswers.readmeConfirm) files.push('README');
+        if (files.length > 2) {
+            const lastFile = files.pop();
+            filesStr = files.join(', ');
+            filesStr += `, and ${lastFile}`;
+        } else if (files.length === 2) {
+            filesStr = files.join(' and ');
+        } else {
+            [filesStr] = files;
+        }
+
         pushCommit = true;
     }
 
     if (pushCommit) {
-        execSync('git init && git add . && git commit -m "First Commit"');
+        execSync(`git init && git add . && git commit -m "docs: Should add ${filesStr}"`);
         execSync('git branch -M main');
     }
 
